@@ -23,9 +23,9 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("https://dummy.json.com/prducts");
+        const response = await fetch("https://dummyjson.com/products");
         const data: FetchResponse = await response.json();
-        console.log(data);
+        Array.from(new Set(data.products.map((product) => product.categories)));
       } catch (error) {
         console.log(error);
       }
