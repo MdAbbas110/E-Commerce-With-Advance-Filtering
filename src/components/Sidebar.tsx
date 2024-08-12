@@ -25,18 +25,78 @@ const Sidebar = () => {
       try {
         const response = await fetch("https://dummyjson.com/products");
         const data: FetchResponse = await response.json();
-        Array.from(new Set(data.products.map((product) => product.categories)));
+        const uniqueCategories = Array.from(
+          new Set(data.products.map((product) => product.category)),
+        );
+        setCategories(uniqueCategories);
       } catch (error) {
-        console.log(error);
+        console.log("error while fetching" + error);
       }
     };
 
     fetchCategories();
   }, []);
-
+  console.log(categories);
   return (
-    <div>
-      <h1>sidebar</h1>
+    <div className="h-screen w-64 border p-5">
+      <h1 className="mb-10 mt-4 text-2xl font-bold">React Store</h1>
+      <section>
+        <input
+          type="text"
+          className="rounded-md border px-2 sm:mb-8"
+          placeholder="Search product"
+        />
+
+        <div className="flex items-center justify-center">
+          <input
+            type="text"
+            className="mb-3 mr-2 w-full rounded border-2 px-5 py-3"
+            placeholder="Min"
+          />
+          <input
+            type="text"
+            className="mb-3 mr-2 w-full rounded border-2 px-5 py-3"
+            placeholder="Max"
+          />
+        </div>
+        <div className="mb-5">
+          <h2 className="mb-3 text-xl font-semibold">Categories </h2>
+        </div>
+
+        <div>
+          {categories.map((category, index) => {
+            return (
+              <label key={index} className="mb-2 block">
+                <input
+                  type="radio"
+                  name="category"
+                  value={category}
+                  className="mr-2 size-4"
+                />
+                {category.toUpperCase()}
+              </label>
+            );
+          })}
+        </div>
+
+        <div className="mb-5 mt-3">
+          <h2 className="mb-3 text-xl font-semibold">Keywords</h2>
+          <div>
+            {keywords.map((keyword, index) => (
+              <button
+                key={index}
+                className="mb-2 block w-full rounded border px-4 py-2 text-left hover:bg-gray-200"
+              >
+                {keyword.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button className="mb-[4em] mt-5 w-full rounded-lg bg-black py-2 text-white transition hover:bg-black/85">
+          Reset filters
+        </button>
+      </section>
     </div>
   );
 };
