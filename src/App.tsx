@@ -4,7 +4,7 @@ import Sidebar from "./components/Sidebar";
 function App() {
   return (
     <Router>
-      <div className="flex h-screen">
+      <div className="flex h-screen bg-neutral-500">
         <Sidebar />
       </div>
     </Router>
