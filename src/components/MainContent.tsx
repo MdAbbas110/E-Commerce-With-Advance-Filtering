@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFilter } from "./Context";
 import { Tally3 } from "lucide-react";
+import axios from "axios";
+import BookCards from "./BookCards";
 
 const MainContent = () => {
   const { searchQuery, selectedCategory, minPrice, maxPrice, keyword } =
@@ -11,6 +13,65 @@ const MainContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [dropdownOpen, setDropDownOpen] = useState(false);
   const itemPerPage = 12;
+
+  useEffect(() => {
+    let url = `https://dummyjson.com/products?limit=${itemPerPage}&skip=${(currentPage - 1) * itemPerPage}`;
+
+    if (keyword) {
+      url = `https://dummyjson.com/products/search?q=${keyword}`;
+    }
+
+    axios
+      .get(url)
+      .then((response) => {
+        setProducts(response.data.products);
+      })
+      .catch((error) => console.error("error fetching the data", error));
+  }, [currentPage, keyword]);
+
+  const getFilteredProducts = () => {
+    let filteredProducts = products;
+
+    if (selectedCategory) {
+      filteredProducts.filter(
+        (product) => product.category === selectedCategory,
+      );
+    }
+
+    if (minPrice !== undefined) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price >= minPrice,
+      );
+    }
+
+    if (maxPrice !== undefined) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price <= maxPrice,
+      );
+    }
+
+    if (searchQuery) {
+      filteredProducts = filteredProducts.filter((product) =>
+        product.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    switch (filter) {
+      case "expensive":
+        return filteredProducts.sort((a, b) => b.price - a.price);
+
+      case "cheap":
+        return filteredProducts.sort((a, b) => a.price - b.price);
+
+      case "popular":
+        return filteredProducts.sort((a, b) => b.rating - a.rating);
+
+      default:
+        return filteredProducts;
+    }
+  };
+
+  const filteredProducts = getFilteredProducts();
 
   return (
     <section className="xs:w-[20rem] p-5 sm:w-[40rem] lg:w-[55rem] xl:w-[55rem]">
@@ -49,7 +110,15 @@ const MainContent = () => {
         </div>
 
         <div className="grid grid-cols-4 gap-5 sm:grid-cols-3 md:grid-cols-4">
-          {/* book cards */}
+          {filteredProducts.map((product) => (
+            <BookCards
+              key={product.id}
+              id={product.id}
+              title={product.title}
+              image={product.thumbnail}
+              price={product.price}
+            />
+          ))}
         </div>
       </div>
     </section>
